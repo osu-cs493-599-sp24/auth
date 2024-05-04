@@ -4,7 +4,7 @@
 
 const { ObjectId } = require('mongodb')
 
-const { getDb } = require('../lib/mongo')
+const { getDb } = require('../lib/mongodb')
 
 /*
  * Insert a new User into the DB.

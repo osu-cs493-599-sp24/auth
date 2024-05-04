@@ -1,7 +1,7 @@
 const express = require('express')
 const morgan = require('morgan')
 
-const { connectToDb } = require('./lib/mongo')
+const { connectToDb } = require('./lib/mongodb')
 const api = require('./api')
 
 const app = express()
@@ -36,7 +36,7 @@ app.use('*', function (err, req, res, next) {
     })
 })
 
-connectToDb.then(function () {
+connectToDb().then(function () {
     app.listen(port, function () {
         console.log("== Server is listening on port:", port)
     })
