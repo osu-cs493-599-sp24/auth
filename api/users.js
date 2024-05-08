@@ -4,7 +4,26 @@
 const { Router } = require('express')
 const router = Router()
 
-const { insertNewUser, getUserById } = require('../models/user')
+const {
+    insertNewUser,
+    getUserById,
+    validateCredentials
+} = require('../models/user')
+
+router.post('/login', async function (req, res, next) {
+    try {
+        const authenticated = await validateCredentials(req.body.id, req.body.password)
+        if (authenticated) {
+            res.status(200).send({})
+        } else {
+            res.status(401).send({
+                error: "Invalid authentication credentials"
+            })
+        }
+    } catch (e) {
+        next(e)
+    }
+})
 
 router.post('/', async function (req, res) {
     /*
