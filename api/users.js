@@ -9,12 +9,16 @@ const {
     getUserById,
     validateCredentials
 } = require('../models/user')
+const { generateAuthToken, requireAuthentication } = require('../lib/auth')
 
 router.post('/login', async function (req, res, next) {
     try {
         const authenticated = await validateCredentials(req.body.id, req.body.password)
         if (authenticated) {
-            res.status(200).send({})
+            const token = generateAuthToken(req.body.id)
+            res.status(200).send({
+                token: token
+            })
         } else {
             res.status(401).send({
                 error: "Invalid authentication credentials"
@@ -38,16 +42,22 @@ router.post('/', async function (req, res) {
     }
 })
 
-router.get('/:id', async function (req, res, next) {
-    try {
-        const user = await getUserById(req.params.id)
-        if (user) {
-            res.status(200).send(user)
-        } else {
-            next()
+router.get('/:id', requireAuthentication, async function (req, res, next) {
+    if (req.user !== req.params.id) {
+        res.status(403).send({
+            error: "Not authorized to access the specified resource"
+        })
+    } else {
+        try {
+            const user = await getUserById(req.params.id)
+            if (user) {
+                res.status(200).send(user)
+            } else {
+                next()
+            }
+        } catch (e) {
+            next(e)
         }
-    } catch (e) {
-        next(e)
     }
 })
 
